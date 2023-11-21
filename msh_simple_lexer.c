@@ -6,13 +6,13 @@
 /*   By: roruiz-v <roruiz-v@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/29 17:39:26 by roruiz-v          #+#    #+#             */
-/*   Updated: 2023/11/14 13:57:17 by roruiz-v         ###   ########.fr       */
+/*   Updated: 2023/11/21 18:16:32 by roruiz-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/* static void	ft_cmd_lstadd_back(t_msh *data, t_cmd_lst *new)
+static void	ft_cmd_lstadd_back(t_msh *data, t_cmd_lst *new)
 {
 	t_cmd_lst	*tmp;
 
@@ -27,11 +27,17 @@
 		new->nx = tmp->nx;
 		tmp->nx = new;
 	}
-} */
+}
+
+static t_rd	*ft_red_addback(void)
+{
+	
+}
 
 static t_cmd_lst	*ft_cmd_lst_new(t_msh *data, char **cmd)
 {
 	t_cmd_lst	*node;
+	t_rd		*rd_nd;
 	int			i;
 
 	(void)data;
@@ -41,8 +47,8 @@ static t_cmd_lst	*ft_cmd_lst_new(t_msh *data, char **cmd)
 	while (cmd[++i])
 		node->c_args[i] = ft_strdup(cmd[i]);
 	node->c_abs_path = ft_strdup(cmd[0]);
-//	node->env_path = ft_find_path(data, node->cmd_args[0]);
-	node->c_env_path = NULL;
+	node->c_env_path = NULL; // se rellena después
+	node->rds = ft_red_addback(n);
 	node->nx = NULL;
 	ft_freedom(cmd);
 	return (node);
@@ -63,12 +69,12 @@ void	ft_simple_lexer(t_msh *data)
 	i = -1;
 	cmd = NULL;
 	cmd = ft_split(data->pipeline, ' ');
-	if (ft_matrix_len(cmd) == 0) // cd en pipeline solo hay espacios en blanco
+	if (ft_matrix_len(cmd) == 0)	// cd en pipeline solo hay espacios en blanco
 	{
 		ft_freedom(cmd);
 		data->error = ERROR_ARGMTS;
 		return ;
 	}
-	ft_msh_lstadd_front(data, ft_cmd_lst_new(data, cmd), 2);
-//	ft_cmd_lstadd_back(data, ft_cmd_lst_new(data, cmd));
+//	ft_msh_lstadd_front(data, ft_cmd_lst_new(data, cmd), 2);
+	ft_cmd_lstadd_back(data, ft_cmd_lst_new(data, cmd));
 }

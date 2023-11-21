@@ -6,7 +6,7 @@
 /*   By: roruiz-v <roruiz-v@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 14:14:49 by roruiz-v          #+#    #+#             */
-/*   Updated: 2023/11/15 19:51:35 by roruiz-v         ###   ########.fr       */
+/*   Updated: 2023/11/21 18:16:54 by roruiz-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 # include <sys/ttydefaults.h>
 # include <readline/readline.h>
 # include <readline/history.h>
+//# include <limits.h>
 //# include <readline/rlstdc.h> 	 // da error
 //# include <readline/rltypedefs.h>  // da error
 
@@ -34,9 +35,16 @@
 # define Y 	"\e[33m"
 # define B 	"\e[34m"
 # define V 	"\e[35m"
-//# include <limits.h>
 
-int	g_listen; // si es que es útil
+# define RD 0		// pipe read extreme
+# define WR 1		// pipe write extreme
+
+# define SIR 0		// simple input redir
+# define DIR 1		// double input redir
+# define SOR 2		// simple output redir
+# define DOR 3		// double output redir
+
+int	g_listen;		// para las señales (podría ser una estructurita de solo cosas de señales)
 
 typedef enum e_error
 {
@@ -55,9 +63,16 @@ typedef enum e_error
 	ERROR_CHDIR_HOME_NOT_SET,
 	ERROR_NO_SUCH_FILE_OR_DIRECTORY,
 	ERROR_START_NO_SUCH_FILE_OR_DIRECTORY,
-	ERROR_SPLIT_EXTRACTING_CMD = 20, // be free!
-	END = 99, // to execute command [exit] or exit caused by an error
+	ERROR_SPLIT_EXTRACTING_CMD = 20, 		// be free!
+	END = 99,
 }	t_error;
+
+typedef struct	s_rd
+{
+	int			type;
+	char		*file;
+	struct s_rd	*nx;	
+}				t_rd;
 
 /**
  * @brief   Each node can be a command or a redirection node,
@@ -68,13 +83,14 @@ typedef enum e_error
  */
 typedef struct	s_cmd_lst
 {
-	int					type;        // 0 = cmd; 1 = redirecmto
+//	int					type;        // 0 = cmd; 1 = redirecmto
 	char				**c_args;	 // cmd[0] + argmts & flags of the command
 	char				*c_abs_path; // absolute direction & command
 	char				*c_env_path; // path (from $PATH) & command (if unset PATH, then ft_strdup from c_abs_path)
 	int					pid;
 	int					fd_in;
 	int					fd_out;
+	struct s_rd			*rds;        // lista de redireccionamtos de cada cmd
 	struct s_msh		*orgn;       // redirección a la struct ppal
 	struct s_cmd_lst	*nx;
 }			t_cmd_lst;
